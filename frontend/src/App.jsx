@@ -7,10 +7,12 @@ import { SocketIOProvider } from "y-socket.io"
 
 export default function App() {
 
+  const editorRef = useRef(null);
+  const [username, setUsername] = useState(()=>{
+    return new URLSearchParams(window.location.search).get("username") || ""
+  })
   const ydoc = useMemo(() => new Y.Doc , [])
   const yText = useMemo(() => ydoc.getText("monaco") , [ydoc])
-  const editorRef = useRef(null);
-  const [username, setUsername] = useState("")
 
   function handleMount(editor){
     editorRef.current = editor
@@ -26,27 +28,30 @@ export default function App() {
     )
   }
 
+  function handleJoin(e){
+    e.preventDefault()
+    setUsername(e.target.username.value)
+    window.history.pushState({},"", "?username" + e.target.username.value)
+  }
+
   if(!username){
     return(
       <main className="h-screen w-full bg-gray-950 flex gap-4 p-4 items-center justify-center">
-        <div className="flex flex-col gap-4">
-          <input 
-          type="text"
-          placeholder="Enter your name"
-          className="p-2 rounded-lg bg-gyay-900 text-white"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)} />
-          <button
-          className="p-2 rounded-lg bg-amver-50 text-gray-600 font-bold"
-          onClick={()=>{
-            if(username.trim()){
-              setUsername(username.trim())
-            }
-          }}></button>
-        </div>
+        <form className="flex flex-col gap-4"
+          onSubmit={handleJoin}>
+            <input 
+              type="text"
+              placeholder="Enter your name"
+              className="p-2 rounded-lg bg-gyay-900 text-white"
+              name="username"/>
+            <button
+              className="p-2 rounded-lg bg-amber-50 text-gray-600 font-bold"
+             >Submit</button>
+        </form>
       </main>
     )
   }
+  
 
   return (
     <main className="h-screen w-full bg-gray-950 flex gap-4 p-4">
